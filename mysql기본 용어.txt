@@ -1,0 +1,32 @@
+mysql -u root -p
+------------------
+show databases;
+use mysql;
+show tables;
+------------------
+create batabase multi(생성 할 데이터베이스 명);
+use multi;
+------------------
+CREATE TABLE STUDENTS( 
+	ID INT, 
+	NAME VARCHAR(100), 
+	PHONE CHAR(13), 
+	ADDRESS VARCHAR(1000) 
+);
+desc students;
+--students 테이블에 저장된 정보를 모두 조회하는 쿼리문을 작성해보자.
+SELECT *FROM STUDENTS;
+INSERT INTO  STUDENTS VALUES( 1, 'changjin', '010-1111-1111', '경기도 화성시' );
+ALTER TABLE STUDENTS ADD SUBJECTS VARCHAR(100);
+INSERT INTO STUDENTS VALUES( 2, 'kim', '010-1111-2222', '서울시 관악구', 'web' );
+
+ALTER TABLE STUDENTS MODIFY SUBJECTS VARCHAR(1000);
+SELECT ID, NAME FROM STUDENTS;
+
+SELECT * FROM STUDENTS WHERE ID=2;
+SELECT ID, NAME FROM STUDENTS WHERE ID=2;
+
+SELECT COUNT(*) FROM STUDENTS;
+
+DROP TABLE STUDENTS;
+DROP DATABASE MULTI;
