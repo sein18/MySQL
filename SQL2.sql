@@ -302,8 +302,8 @@ where DEPT_CODE IN('D5','D9') and extract(year from hire_date) ='2004';
 -- --------------------------------------------------------
 -- 2. 직원명, 입사일, 입사한 달의 근무일수 조회
 --   단, 주말도 포함함 ( LAST_DAY() : 주어진 날짜의 해당월의 마지막 날 반환)
-select EMP_NAME '직원 명', 
-	HIRE_DATE '입사일', 
+select EMP_NAME '직원 명',
+	HIRE_DATE '입사일',
 datediff(last_day(HIRE_DATE),HIRE_DATE)  '입사한 달의 근무일수' 
 from employee;
 -- --------------------------------------------------------
@@ -329,8 +329,7 @@ select EMP_NAME 사원명,
 		when DEPT_CODE = 'D9' then '영업부'
 	end '근무 여부'
 from employee
-where DEPT_CODE ='D5' or DEPT_CODE ='D6' or DEPT_CODE ='D9';
-
+where DEPT_CODE in('D5','D6','D9');
 -- --------------------------------------------------------
 select *from employee ;
 
