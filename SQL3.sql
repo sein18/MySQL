@@ -73,7 +73,7 @@ select LAST_DAY(now());
 select EMP_ID ,EMP_NAME ,DEPT_CODE ,HIRE_DATE  
 from employee
 where DATE_ADD(HIRE_DATE, interval 20 year) <= NOW();
-
+-- --------------------------------------------------------------------------------------
 -- 형변환 함수--
 -- CAST(), CONVERT() : 주어진 값을 원하는 형식으로 변경.
 select cast(20220429 as DATE), convert(20220429,DATE); 
@@ -174,16 +174,16 @@ where DEPT_CODE = 'D5'
 union
 select EMP_ID ,EMP_NAME ,DEPT_CODE ,SALARY  
 from employee
-where SALARY  > 3000000;
+where SALARY  < 3000000;
 
 -- UNION ALL
 select EMP_ID ,EMP_NAME ,DEPT_CODE ,SALARY  
 from employee
 where DEPT_CODE = 'D5'
-union -- ALL 
-select EMP_ID ,EMP_NAME ,DEPT_CODE ,EMP_NO  
+union all-- ALL 
+select EMP_ID ,EMP_NAME ,DEPT_CODE ,SALARY  
 from employee
-where SALARY  > 3000000;
+where SALARY  < 3000000;
 -- --------------------------------------------------------------------------------------
 -- JOIN : 두 개 이상의 테이블을 하나로 합쳐 사용하는 명령 구문
 -- 만약에 'J6'라는 직급을 가진 사원들의 근무 부서명이 궁금하다.
@@ -202,7 +202,7 @@ join department ON(DEPT_CODE = DEPT_ID);
 select EMP_ID,EMP_NAME,JOB_CODE,JOB_NAME
 from  employee 
 -- join job ON(JOB_CODE = JOB_CODE);
-join job USING(job_CODE)
+join job USING(job_CODE);
 -- --------------------------------------------------------------------------------------
 -- 실습 EMPLOYEE 테이블의 직원 급여 정보와 SAL_GRADE의 급여 등급을 합쳐서 사번, 사원명, 급여 등급, 등급 기준 최소 급여, 등급 기준 최대 급여를 조회
 -- 정보 확인
@@ -342,16 +342,44 @@ join department ON(DEPT_CODE=DEPT_ID)
 join job USING(JOB_CODE)
 ) T;
  
-			
+-- Inline View(인라인 뷰)사용하는 이유	
+-- 오류 o
 select EMP_NAME ,SALARY,
 	rank() over(order by SALARY desc) 순위
 from employee
 where 순위 < 5; 			
-			
+-- 오류 x		
 select *
 from (select EMP_NAME ,SALARY,
 	rank() over(order by SALARY desc) 순위
 from employee) T
 where 순위 < 5;
-			
+-- --------------------------------------------------------------------------------------
+-- RANK() / DENSE_RANK() / ROW_NUMBER()
+select EMP_NAME ,SALARY,
+	RANK() OVER(order by SALARY DESC) 순위
+from employee; -- 19, 19, 21 ~
+
+select EMP_NAME ,SALARY,
+	DENSE_RANK() OVER(order by SALARY DESC) 순위
+from employee; -- 19, 19, 20 ~
+
+select EMP_NAME ,SALARY,
+	ROW_NUMBER() OVER(order by SALARY DESC) 순위
+from employee; -- 19, 20, 21 ~
+
+select *
+from (select EMP_NAME ,SALARY,
+	ROW_NUMBER() OVER(order by SALARY DESC) 순위
+	from employee) T
+where 순위 < 4;
+-- --------------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
 			

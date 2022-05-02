@@ -44,7 +44,8 @@ from employee;
 -- 실습 1. DEPARTMENT 테이블을 참조하여, 부서가 '해외영업2부'인 부서의 부서코드를 찾고, 
 -- EMPLOYEE테이블에서 해당 부서의 사원들 중 급여를 200만원보다 많이 받는 직원의 사번, 사원명, 급여를 조회하시오.
 -- 1) '해외영업2부' 부서의 부서코드 조회
-select *from department 
+select *
+from department 
 where DEPT_TITLE ='해외영업2부'; -- D6
 -- 2) 직원 조회
 select *from employee ;
@@ -138,7 +139,7 @@ select EMP_NAME '이름', substr(EMAIL,1,instr(EMAIL,'@')-1) 'ID' from employee ;
 -- --------------------------------------------------------
 -- LPAD/ RPAD
 -- 빈칸을 지정한 문자로 채우는 함수
-select lpad(EMAIL,20,'#') from employee ;
+select LPAD(EMAIL,20,'#') from employee ;
 select RPAD(EMAIL,20,'#') from employee ;
 -- --------------------------------------------------------
 -- TRIM
