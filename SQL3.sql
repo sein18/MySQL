@@ -244,7 +244,7 @@ from employee E
 join sal_grade S on(SALARY between MIN_SAL and MAX_SAL)
 
 -- SELF JOIN : 자기 자신을 조인하는 방법
--- 직원의 정보와 직원을 관ㄹ하는 매니저의 정보를 조회
+-- 직원의 정보와 직원을 관리하는 매니저의 정보를 조회
 select E.EMP_ID 사번,E.EMP_NAME 사원명, E.MANAGER_ID "관리자 사번", M.EMP_NAME 관리자명 
 from employee E
 join employee M on (E.MANAGER_ID = M.EMP_ID );

@@ -4,7 +4,7 @@ show databases;
 use mysql;
 show tables;
 ------------------
-create batabase multi(생성 할 데이터베이스 명);
+create database multi(생성 할 데이터베이스 명);
 use multi;
 ------------------
 CREATE TABLE STUDENTS( 

@@ -129,4 +129,3 @@ select *from job;
 select *from sal_grade;
 
 
-

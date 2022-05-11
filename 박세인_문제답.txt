@@ -1,0 +1,64 @@
+-- 1. 조인을 통해 사번 , 사원명, 관리자사번, 부서명을 관리자 사번을 기준으로 내림차순으로 정렬하시오.
+
+SELECT EMP_ID 사번,EMP_NAME 사원명, DEPT_ID "관리자 사번", DEPT_TITLE 부서명 
+from employee 
+join department on (DEPT_CODE = DEPT_ID)
+ORDER BY 3;
+
+-- 2. 입사한 날짜가 '2005-01-01' 이후인 사원명, 입사한 날짜를 입시한 날짜를 기준으로 오름차순을 하시오.
+
+select EMP_NAME ,HIRE_DATE  from employee 
+where HIRE_DATE >'2005-01-01'
+order by HIRE_DATE desc;  
+
+-- 3. 사번, 사원명, 입사일, 입사년도부터 현재년도와 차이를 기준으로 내림차순으로 정렬하시오.
+
+select EMP_ID ,EMP_NAME ,HIRE_DATE 입사일,
+	TIMESTAMPDIFF(year, HIRE_DATE, NOW())
+from employee
+where HIRE_DATE>'2000-01-01'
+order by 4;
+
+-- 4 사번 사원명 부서코드 입사일을 부서코드가 D1, D5인 직원들 중에서 2005년도에 이후에 입사한 직원의 수를 내림차순으로 조회하시오.
+
+select EMP_ID '사번', 
+	EMP_NAME '사원명',
+	DEPT_CODE '부서코드',
+	HIRE_DATE '입사일' 
+from employee
+where DEPT_CODE IN('D1','D5') and extract(year from hire_date) >'2005'
+order by 4;
+
+-- 5 student테이블을 만드시오 (ST_NUM INT primary key, ST_NAME VARCHAR(30) not null)
+
+drop table student;
+create table STUDENT(
+	ST_NUM INT primary key,
+	ST_NAME VARCHAR(30) not null
+);
+
+-- 6 study_FOREIGN_KEY테이블을 만드시오(ST_NO INT primary key, ST_KOR INT not NULL, ST_ENG INT not NULL)
+
+student테이블과 제약조건을 통해 참조하시오.
+drop table STUDENT_FOREIGN_KEY;
+create table STUDENT_FOREIGN_KEY(
+	ST_NO INT primary key,
+	ST_KOR INT not NULL,
+	ST_ENG INT not NULL,
+	constraint FK_STUDENT_NUM foreign key(ST_NO)
+	references STUDENT(ST_NUM)
+);
+
+-- 7 student테이블과 study_FOREIGN_KEY테이블에 데이터를 insert하시오.
+
+insert into STUDENT VALUES(1,'이순신');
+insert into STUDENT VALUES(2,'홍길동');
+
+insert into STUDENT_FOREIGN_KEY VALUES(1,60,70);
+insert into STUDENT_FOREIGN_KEY VALUES(2,80,90);
+
+-- 8 조인을 통해 테이블을 합쳐서 학생번호,이름,수학점수,영어점수를 조회하시오.
+
+select ST_NUM,ST_NAME,ST_KOR,ST_ENG
+from student 
+left join STUDENT_FOREIGN_KEY on(ST_NUM=ST_NO);

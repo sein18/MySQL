@@ -11,7 +11,6 @@ create table MEMBER(
 	MEMBER_NAME VARCHAR(15) COMMENT '회원이름'
 );
 desc member;
-
 select *from member;
 
 -- 제약조건(CONSTRAINTS)
@@ -91,7 +90,7 @@ create table user_unique3(
 	USER_NO INT,
 	USER_ID VARCHAR(20),
 	USER_PW VARCHAR(30),
-	unique(USER_NO, USER_ID)
+	unique(USER_NO, USER_ID) -- 두개가 한번에
 ); 
 insert into user_unique3 values(1,'USER01','PASS01');
 insert into user_unique3 values(1,'USER02','PASS02');
@@ -177,8 +176,8 @@ create table user_pk_table2(
 	GENDER VARCHAR(15) CHECK(GENDER in('남','여')),
 	constraint PK_USER_NOID primary KEY(USER_NO,USER_ID)
 ); 
-
-insert into user_pk_table2 values (1,'USER01');
+ 
+insert into user_pk_table2 values (1,'USER01','231','남');
 -- 1, USER01 --> 성공
 -- 2, USER02 --> 성공
 -- 3, USER03 --> 성공
@@ -201,7 +200,6 @@ insert into USER_GRADE VALUES(1,'일반회원');
 insert into USER_GRADE VALUES(2,'VIP');
 insert into USER_GRADE VALUES(3,'VVIP');
 insert into USER_GRADE VALUES(4,'VVVIP');
-
 
 select *from user_grade;
 
@@ -280,29 +278,307 @@ create table USER_FOREIGN_KEY(
 
 insert into USER_FOREIGN_KEY VALUES(1,'123','321','F',2);
 -- insert into USER_FOREIGN_KEY VALUES(2,'ABC','ABC1','M',4);
-insert into USER_FOREIGN_KEY VALUES(3,'456','654','M',1);
+insert into USER_FOREIGN_KEY VALUES(3,'456','654','M',10);
 insert into USER_FOREIGN_KEY VALUES(4,'DEF','DEF1','F',3);
-insert into USER_FOREIGN_KEY VALUES(5,'QWE','QWE1','F',1);
+insert into USER_FOREIGN_KEY VALUES(5,'QWE','QWE1','F',10);
 
 select *from USER_GRADE;
 select *from user_foreign_key;
 
-update user_grade set GRADE_CODE = 10 where grade_code = 1;
+update user_grade set GRADE_CODE = 1 where grade_code = 10;
 -- ------------------------------------------------------------------
+-- 기본값 설정하기
+drop table default_table;
+create table default_table(
+	data_col1 varchar(30) default '없음',
+	data_col2 date default (CURRENT_DATE),
+	data_col3 DATETIME default (CURRENT_TIME)
+);
+insert into default_table values(default,default,default);
+
+select *from default_table;
+-- ------------------------------------------------------------------
+-- DDL - ALTER
+-- ALTER : 수정
+alter table department add constraint PK_DEPT_DEPRID primary KEY(DEPT_ID);
+
+alter table employee add constraint foreign key(DEPT_CODE) references DEPARTMENT(DEPT_ID);
+alter table employee add constraint foreign KEY(SAL_LEVEL) references SAL_GRADE(SAL_LEVEL);
+
+alter table employee add CHECK(ENT_YN in('Y','N'));
+alter table employee add CHECK(SALARY>0);
+
+alter table employee add UNIQUE(EMP_NO);
+
+alter table employee add foreign KEY(JOB_CODE) references JOB(JOB_CODE);
+
+alter table department add foreign KEY(location_ID) references LOCATION(LOCAL_CODE);
+
+alter table location add foreign KEY(national_CODE) references NATIONAL(NATIONAL_CODE);
+-- ------------------------------------------------------------------
+-- DML
+-- SELECT, INSERT, UPDATE, DELETE
+-- [CRUD] 
+-- C : INSERT
+-- R : SELECT
+-- U : UPDATE
+-- D : DELETE
+
+-- INSERT 새로운 로우(행)를 특정 테이블에 추가하는 명령이다.
+desc employee;
+
+-- 컬럼 명시
+insert into employee (EMP_ID, EMP_NAME, EMP_NO, EMAIL,PHONE, DEPT_CODE,JOB_CODE,SAL_LEVEL,SALARY,
+					BONUS,MANAGER_ID,HIRE_DATE,ENT_DATE,ENT_YN)
+				VALUES(500,'이차진','700101-1234567','LEE@NAVER.COM','01011111111','D1','J7','S4',
+					3100000,0.1,'200',now(),null, default);
+
+select *from employee 
+where EMP_NAME = '이차진';
+
+-- 컬럼 생략 (모든 컬럼에 값 추가)
+insert into employee values(900,'오민섬','510101-1234567','park@NAVER.COM','01011111111','D1','J4','S3',
+					4300000,0.2,'200',now(),null, default);
+
+-- INSERT + SUBQAUERY
+
+create table EMP_01(
+	EMP_ID INT,
+	EMP_NAME VARCHAR(20),
+	DEPT_TITLE VARCHAR(40)
+);
+
+insert into EMP_01 (select EMP_ID,EMP_NAME,DEPT_TITLE 
+					from employee
+					left join department on(DEPT_CODE=DEPT_ID)
+);
+
+select *from emp_01;
+-- ------------------------------------------------------------------
+-- UPDATE : 해당 테이블의 데이터를 수정하는 명령어
+create table DEPT_COPY 
+as select * from department;
+
+select *from dept_Copy;
+
+update DEPT_COPY set DEPT_TITLE = '전략기획부로' where DEPT_ID = 'D9';
+
+-- EMPLOYEE 주민번호 잘못 표기된 데이터.
+select EMP_ID, EMP_NO
+from employee
+where SUBSTR(EMP_NO,5,2) > 31;
+-- 200, 201, 214
+
+desc employee ;
+update employee set EMP_NO = CONCAT('621230',substr(EMP_NO ,7))
+where EMP_ID =200;
+
+update employee set EMP_NO = CONCAT('631126',substr(EMP_NO ,7))
+where EMP_ID =201;
+
+update employee set EMP_NO = CONCAT('850705',substr(EMP_NO ,7))
+where EMP_ID =214;
+
+select EMP_ID ,EMP_NO  
+from employee 
+where EMP_ID IN('200','201','214');
+
+-- SQL Error [1452] [23000]: Cannot add or update a child row: a foreign key constraint fails
+update employee set DEPT_CODE = 'D0' where DEPT_CODE ='D6';
+
+update employee set ENT_YN = default where EMP_ID = 222;
+-- ------------------------------------------------------------------
+-- DELETE
+-- 테이블의 행을 삭제하는 명령어
+
+create table TEST_DELETE as select *from employee;
+
+select *from test_delete;
+
+-- DELETE를 통해 전체 삭제
+delete from test_delete;
+-- ------------------------------------------------------------------
+drop table DEPT_COPY;
+
+create table DEPT_COPY as select *from department;
+
+select *from dept_copy;
+-- 컬럼 추가
+alter table DEPT_COPY add (LNAME VARCHAR(20));
+-- 컬럼 삭제
+alter table DEPT_COPY drop column LNAME;
+-- 컬럼 추가(기본값을 적용하여 추가)
+alter table DEPT_COPY add (LNAME VARCHAR(20) default '한국');
+
+alter table DEPT_COPY add CONSTRAINT PK_DEPTCOPY primary key(DEPT_ID);
+
+desc dept_copy ;
+
+-- select(연산자,함수) CREATE INSERT, UPDATE, DELETE, DROP, ALTER
+-- ------------------------------------------------------------------
+-- TCL
+-- COMMIT, ROLLBACK (+SAVEPOINT, ROLLBACK TO)
+
+-- 트랜잭션 : 데이터를 처리하는 최소 단위.
+-- 하나의 트랜잭션을 이루어진 작업은 반드시 작업 내용이 모두 성공하여 저장되거나, 실패하여 모두 이전으로 복구되어야 한다.
+commit;
+
+create table USER_TBL(
+	USER_NO INT unique,
+	USER_ID VARCHAR(20) not null unique,
+	USER_PW VARCHAR(30) not null
+);
+
+desc USER_TBL;
+
+insert into USER_TBL values(1,'TEST01','PASS01');
+insert into USER_TBL values(2,'TEST02','PASS02');
+
+select *from USER_TBL;
+
+commit; -- 현재까지 작업한 DML내용을 DB에 반영한다.
+
+insert into USER_TBL values(3,'TEST03','PASS03');
+
+select *from USER_TBL;
+
+rollback; -- 가장 최근에 COMMIT했던 구간으로 되돌아 가겠다.
+
+select *from USER_TBL;
+
+insert into USER_TBL values(3,'TEST03','PASS03');
+savepoint SP1;
+
+insert into USER_TBL VALUES(4,'TEST04','PASS04');
+select *from USER_TBL;
+
+rollback to SP1;
+select *from USER_TBL;
+
+rollback;
+select *from USER_TBL;
+-- ------------------------------------------------------------------
+-- VIEW(뷰) --
+
+-- CREATE VIEW 뷰이름
+-- AS 서브쿼리(뷰에서 확인할 SELECT 쿼리)
+
+create view V_EMP
+as select EMP_ID,EMP_NAME,DEPT_CODE from EMPLOYEE;
+
+select *from V_EMP;
 
 
+-- 사번, 이름, 직급명, 부서명, 근무지역을 조회
+-- 그 결과를 V_RES_EMP 라는 뷰를 만들고 헤당 뷰를 통해 결과 조회
 
+-- 1) 서브쿼리 준비
+select EMP_ID, EMP_NAME, JOB_NAME, DEPT_TITLE, LOCAL_NAME
+from employee
+left join JOB USING(JOB_CODE)
+left join department on(DEPT_CODE = DEPT_ID)
+left join location on(LOCATION_ID =LOCAL_CODE);
 
+-- 2) 뷰 생성
+create or replace view V_RES_EMP(사번,이름,직급,부서명,근무지)
+as select EMP_ID, EMP_NAME, JOB_NAME, DEPT_TITLE, LOCAL_NAME
+from employee
+left join JOB USING(JOB_CODE)
+left join department on(DEPT_CODE = DEPT_ID)
+left join location on(LOCATION_ID =LOCAL_CODE);
 
+select *from V_RES_EMP;
+-- 8문제 , 9일 제출 (메모장으로 제출)
 
+show create view V_RES_EMP;
 
+-- 만들어진 VIEW(V_RES_EMP)를 활용하여 사번이 '205'인 직원 정보 조회하기.
 
+select * from V_RES_EMP
+where TKQJS = '205';
 
+commit;
+-- 뷰 삭제
+drop view V_RES_EMP;
+-- 컬럼별 별칭을 붙일 수 있다.
+create or replace view V_EMP(사번, 사원명, 부서코드)
+as 
+select EMP_ID,EMP_NAME ,DEPT_CODE 
+from EMPLOYEE;
+-- 뷰에서 연산,함수 결과도 포함하여 저장 가능.
 
+-- 사번, 이름, 성별, 근무년수 조회
+-- 1)
+select EMP_ID,EMP_NAME,
+	IF(SUBSTR(EMP_NO,8,1)=1,'남성','여성'),
+	extract(year from NOW()) - extract(year from HIRE_DATE)
+from employee;
+-- 2)
+create or replace view V_EMP(사번, 이름, 성별, 근무년수)
+as 
+select EMP_ID,EMP_NAME,
+	IF(SUBSTR(EMP_NO,8,1)=1,'남성','여성'),
+	extract(year from NOW()) - extract(year from HIRE_DATE)
+from employee;
 
+select *from V_EMP;
 
+-- 뷰에 데이터 삽입, 수정 삭제하기
+create or replace view V_JOB
+as
+select *from JOB;
 
+select *from V_JOB;
+select *from JOB;
 
+-- 뷰를 통한 데이터 추가
+insert into V_JOB values ('J8','인턴');
+-- 뷰를 통해 데이터 수정도 가능
+update V_JOB
+set JOB_NAME = '알바'
+where JOB_CODE = 'J8';
+-- 뷰를 통해 데이터 삭제도 가능
+delete from V_JOB
+where JOB_CODE='J8';
+-- ------------------------------------------------------------------
+-- AUTO_INCREMENT
+-- INSERT 할때 마다 자동으로 1씩 증가.
+create table AT_TEST(
+	ID INT auto_increment primary key,
+	NAME VARCHAR(30)
+);
+
+select *from AT_TEST;
+desc AT_TEST;
+
+insert into AT_TEST values(1,'홍길동');
+insert into AT_TEST values(11,'김유신');
+
+insert into AT_TEST values(null,'고길동');
+insert into AT_TEST values(null,'유관순');
+insert into AT_TEST (NAME) values('신사임당');
+select *from AT_TEST;
+
+-- 현재 어느 숫자까지 증가 되었는지 확인
+select LAST_INSERT_ID();
+-- 변경
+alter table AT_TEST auto_increment = 50;
+select *from AT_TEST;
+insert into AT_TEST (NAME) values('신사임당');
+
+set @@AUTO_INCREMENT_INCREMENT=1; -- STATIC 느낌이 든다.
+insert into AT_TEST (NAME) values('신사임당');
+
+select *from AT_TEST;
+
+create table AT_TEST2(
+	ID INT auto_increment primary key,
+	NAME VARCHAR(30) 
+);
+
+insert into at_test2 VALUES(null,'A');
+insert into at_test2 VALUES(null,'B');
+select *from AT_TEST2;
 
 
 
